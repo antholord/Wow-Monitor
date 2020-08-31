@@ -18,10 +18,14 @@ export default {
           mandatory: {
             chromeMediaSource: 'desktop',
             chromeMediaSourceId: source.id,
-            minWidth: settings.width,
-            maxWidth: settings.width,
-            minHeight: settings.height,
-            maxHeight: settings.height
+            minWidth: screen.workArea.width,
+            maxWidth: screen.workArea.width,
+            minHeight: screen.workArea.height,
+            maxHeight: screen.workArea.height
+            // minWidth: settings.width,
+            // maxWidth: settings.width,
+            // minHeight: settings.height,
+            // maxHeight: settings.height
             // frameRate: { max: settings.flaskUI.fps }
           }
         } as any

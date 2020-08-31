@@ -11,6 +11,7 @@ const displayHeightModifier = 1;
 
 const createCanvas = () => {
   const canvas = document.createElement('canvas');
+
   canvas.width = captureWidth * displayWidthModifier;
   canvas.height = captureHeight * displayHeightModifier;
   return canvas;
@@ -46,17 +47,27 @@ export default {
             video,
             x,
             y,
-            captureWidth,
-            captureHeight,
+            screen.workArea.width,
+            screen.workArea.height,
             0,
             0,
             captureWidth * displayWidthModifier,
             captureHeight * displayHeightModifier
           );
-          //   const imageData = ctx!.getImageData(0, 0, captureWidth * displayWidthModifier, captureHeight * displayHeightModifier);
-          //   PixelUtils.keepOnlyPixels(imageData.data, 5, RGBA(248, 215, 151, 255));
-          //   ctx!.putImageData(imageData, 0, 0);
-          setTimeout(() => requestAnimationFrame(loop), 1000 / 60);
+          requestAnimationFrame(loop);
+
+      // ctx!.drawImage(
+      //   video,
+      //   x,
+      //   y,
+      //   captureWidth * displayWidthModifier,
+      //   captureHeight * displayHeightModifier,
+      //   0,
+      //   0,
+      //   captureWidth * displayWidthModifier,
+      //   captureHeight * displayHeightModifier
+      // );
+      // requestAnimationFrame(loop);
     };
 
     parentDiv.appendChild(canvas);
