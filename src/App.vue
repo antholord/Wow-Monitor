@@ -1,11 +1,7 @@
 <template>
   <div id="app">
     <electron-header v-show="!hideFrame" />
-    <!-- <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div> -->
-    <!-- <router-view/> -->
+
     <div id="main">
       <div id="canvasParent">
       </div>
@@ -21,25 +17,26 @@ import ElectronHeader from '@/components/ElectronHeader.vue';
 export default Vue.extend({
   data() {
     return {
-      hideFrame: false
+      hideFrame: false,
+      windowId: ''
     };
   },
   components: {
     ElectronHeader
   },
   async mounted() {
-    const resp = await GameCapture.start(document.getElementById('canvasParent') as HTMLDivElement);
-    if (!resp) return;
-    const canvas = resp.canvas;
-    const windowId = resp.windowId;
     this.$electron.ipcRenderer.on('swap-game-window', () => {
       (document.getElementById('canvasParent') as HTMLDivElement).innerHTML = '';
-      GameCapture.start(document.getElementById('canvasParent') as HTMLDivElement);
+      GameCapture.start(document.getElementById('canvasParent') as HTMLDivElement, this.windowId);
     });
     this.$electron.ipcRenderer.on('toggle-frame', () => {
       this.hideFrame = !this.hideFrame;
     });
-    //
+
+    const resp = await GameCapture.start(document.getElementById('canvasParent') as HTMLDivElement);
+    if (!resp) return;
+    const canvas = resp.canvas;
+    const windowId = resp.windowId;
   },
   methods: {
   },

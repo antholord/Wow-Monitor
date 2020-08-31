@@ -1,4 +1,4 @@
-# websockets-front
+# Wow Monitor
 
 ## Project setup
 ```

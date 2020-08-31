@@ -29,6 +29,8 @@ const createVideo = (stream: MediaStream): Promise<HTMLVideoElement> => {
 
 export default {
   async start(parentDiv: HTMLDivElement, windowNameToExclude?: string) : Promise<{canvas: HTMLCanvasElement, windowId: string} | void> {
+    if (windowNameToExclude === '') windowNameToExclude = undefined;
+
     const { stream, screen, windowId } = await CaptureScreen.captureScreen(settings.windowName, windowNameToExclude ? [windowNameToExclude] : undefined) || {};
     if (stream == null || screen == null) return;
 

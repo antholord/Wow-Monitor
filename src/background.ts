@@ -75,6 +75,7 @@ app.on('ready', async() => {
     }
   }
   createWindow();
+  win?.setAlwaysOnTop(true, 'pop-up-menu');
 });
 
 // Exit cleanly on request from parent process in development mode.
