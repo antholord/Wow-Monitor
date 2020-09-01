@@ -1,7 +1,9 @@
-import { desktopCapturer, Display, remote } from 'electron';
+import { desktopCapturer, Display, remote, globalShortcut } from 'electron';
 import settings from '../../settings';
 
 const getSourcesAttempts = 15;
+
+let globalStream : MediaStream | null;
 
 const findFittingSource = async function(windowName: string, windowIdsToAvoid: string[]): Promise<Electron.DesktopCapturerSource | null> {
   for (let i = 0; i <= getSourcesAttempts; i++) {
@@ -15,6 +17,11 @@ const findFittingSource = async function(windowName: string, windowIdsToAvoid: s
 
 export default {
   async captureScreen(windowName: string, windowIdsToAvoid: string[] = []) : Promise<{screen : Display, stream : MediaStream, windowId : string} | null> {
+    if (globalStream) {
+      globalStream.getTracks().forEach(track => {
+        track.stop();
+      });
+    }
     const source = await findFittingSource(windowName, windowIdsToAvoid);
     if (!source) return null;
 
@@ -41,6 +48,7 @@ export default {
           }
         } as any
       });
+      globalStream = stream;
       return { stream, screen, windowId: source.id };
     } catch (e) {
       console.error(e);
