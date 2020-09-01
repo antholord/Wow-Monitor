@@ -4,16 +4,15 @@ import settings from '../../settings';
 
 const x = 0;
 const y = 0;
-const captureWidth = settings.width;
-const captureHeight = settings.height;
-const displayWidthModifier = 1;
-const displayHeightModifier = 1;
 
-const createCanvas = () => {
+const displayWidthModifier = 0.5;
+const displayHeightModifier = 0.5;
+
+const createCanvas = (screen: Electron.Display) => {
   const canvas = document.createElement('canvas');
 
-  canvas.width = captureWidth * displayWidthModifier;
-  canvas.height = captureHeight * displayHeightModifier;
+  canvas.width = screen.workArea.width * displayWidthModifier;
+  canvas.height = screen.workArea.height * displayHeightModifier;
   return canvas;
 };
 
@@ -35,7 +34,7 @@ export default {
     const { stream, screen, windowId } = await CaptureScreen.captureScreen(settings.windowName, windowNameToExclude ? [windowNameToExclude] : undefined) || {};
     if (stream == null || screen == null) return;
 
-    const canvas = createCanvas();
+    const canvas = createCanvas(screen);
     const ctx = canvas.getContext('2d');
 
     // const availTop = (window.screen as any).availTop - screen.bounds.y;
@@ -51,8 +50,8 @@ export default {
             screen.workArea.height,
             0,
             0,
-            captureWidth * displayWidthModifier,
-            captureHeight * displayHeightModifier
+            canvas.width,
+            canvas.height
           );
           requestAnimationFrame(loop);
 

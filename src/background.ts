@@ -1,10 +1,11 @@
 'use strict';
 
-import { app, protocol, BrowserWindow, globalShortcut } from 'electron';
+import { app, protocol, BrowserWindow, globalShortcut, screen } from 'electron';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 import settings from './settings';
 const isDevelopment = process.env.NODE_ENV !== 'production';
+app.commandLine.appendSwitch('webrtc-max-cpu-consumption-percentage', '100');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -18,8 +19,8 @@ protocol.registerSchemesAsPrivileged([
 function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
-    width: settings.width,
-    height: settings.height,
+    width: screen.getPrimaryDisplay().workAreaSize.width * settings.widthScaleRatio,
+    height: screen.getPrimaryDisplay().workAreaSize.height * settings.heightScaleRatio,
     frame: false,
     transparent: false,
     webPreferences: {

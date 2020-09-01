@@ -25,9 +25,13 @@ export default Vue.extend({
     ElectronHeader
   },
   async mounted() {
-    this.$electron.ipcRenderer.on('swap-game-window', () => {
+    this.$electron.ipcRenderer.on('swap-game-window', async() => {
       (document.getElementById('canvasParent') as HTMLDivElement).innerHTML = '';
-      GameCapture.start(document.getElementById('canvasParent') as HTMLDivElement, this.windowId);
+      console.log(this.windowId);
+      const resp = await GameCapture.start(document.getElementById('canvasParent') as HTMLDivElement, this.windowId);
+      if (resp) {
+        this.windowId = resp.windowId;
+      }
     });
     this.$electron.ipcRenderer.on('toggle-frame', () => {
       this.hideFrame = !this.hideFrame;
@@ -36,7 +40,7 @@ export default Vue.extend({
     const resp = await GameCapture.start(document.getElementById('canvasParent') as HTMLDivElement);
     if (!resp) return;
     const canvas = resp.canvas;
-    const windowId = resp.windowId;
+    this.windowId = resp.windowId;
   },
   methods: {
   },
