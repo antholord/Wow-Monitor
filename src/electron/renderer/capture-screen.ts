@@ -1,14 +1,14 @@
 import { desktopCapturer, Display, remote, globalShortcut } from 'electron';
 import settings from '../../settings';
 
-const getSourcesAttempts = 15;
+const getSourcesAttempts = 8;
 
 let globalStream : MediaStream | null;
 
-const findFittingSource = async function(windowName: string, windowIdsToAvoid: string[]): Promise<Electron.DesktopCapturerSource | null> {
+const findFittingSource = async function(windowName: string, windowIdsToAvoid: string[] = []): Promise<Electron.DesktopCapturerSource | null> {
   for (let i = 0; i <= getSourcesAttempts; i++) {
     const sources = await desktopCapturer.getSources({ types: ['window'] });
-    const source = sources.find(s => s.name.includes(windowName) && windowIdsToAvoid.find(w => s.id === w) == null);
+    const source = sources.find(s => s.name.toUpperCase() === windowName.toUpperCase() && windowIdsToAvoid.find(w => s.id === w) == null);
     if (source) return source;
   }
 
@@ -22,10 +22,14 @@ export default {
         track.stop();
       });
     }
-    const source = await findFittingSource(windowName, windowIdsToAvoid);
+    let source = await findFittingSource(windowName, windowIdsToAvoid);
+    if (!source) {
+      source = await findFittingSource(windowName);
+    }
     if (!source) return null;
 
     const screen = remote.screen.getPrimaryDisplay();
+    console.log(screen);
     if (!screen) return null;
 
     try {
@@ -35,10 +39,10 @@ export default {
           mandatory: {
             chromeMediaSource: 'desktop',
             chromeMediaSourceId: source.id,
-            minWidth: screen.workArea.width,
-            maxWidth: screen.workArea.width,
-            minHeight: screen.workArea.height,
-            maxHeight: screen.workArea.height,
+            minWidth: screen.size.width / screen.scaleFactor,
+            maxWidth: (screen.size.width / screen.scaleFactor) + 1000,
+            minHeight: screen.size.height / screen.scaleFactor,
+            maxHeight: (screen.size.height / screen.scaleFactor) + 1000,
             // minWidth: settings.width,
             // maxWidth: settings.width,
             // minHeight: settings.height,

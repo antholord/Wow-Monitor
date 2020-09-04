@@ -11,15 +11,21 @@ const displayHeightModifier = 0.5;
 const createCanvas = (screen: Electron.Display) => {
   const canvas = document.createElement('canvas');
 
-  canvas.width = screen.workArea.width * displayWidthModifier;
-  canvas.height = screen.workArea.height * displayHeightModifier;
+  canvas.width = screen.size.width * displayWidthModifier;
+  canvas.height = screen.size.height * displayHeightModifier;
   return canvas;
 };
 
-const createVideo = (stream: MediaStream): Promise<HTMLVideoElement> => {
+const createVideo = (stream: MediaStream, screen: Electron.Display | null): Promise<HTMLVideoElement> => {
   const video = document.createElement('video');
+  video.id = 'video';
+  if (screen) {
+    video.width = screen.size.width * displayWidthModifier;
+    video.height = screen.size.height * displayHeightModifier;
+  }
   video.autoplay = true;
   video.srcObject = stream;
+
   return new Promise(resolve => {
     video.addEventListener('playing', () => {
       resolve(video);
@@ -28,7 +34,18 @@ const createVideo = (stream: MediaStream): Promise<HTMLVideoElement> => {
 };
 
 export default {
-  async start(parentDiv: HTMLDivElement, windowNameToExclude?: string) : Promise<{canvas: HTMLCanvasElement, windowId: string} | void> {
+  async startVideo(parentDiv: HTMLDivElement, windowNameToExclude?: string) : Promise<{video: HTMLVideoElement, windowId: string} | void> {
+    if (windowNameToExclude === '') windowNameToExclude = undefined;
+
+    const { stream, screen, windowId } = await CaptureScreen.captureScreen(settings.windowName, windowNameToExclude ? [windowNameToExclude] : undefined) || {};
+    if (stream == null || screen == null) return;
+
+    const video = await createVideo(stream, screen);
+    parentDiv.appendChild(video);
+
+    return { video, windowId: windowId! };
+  },
+  async startCanvas(parentDiv: HTMLDivElement, windowNameToExclude?: string) : Promise<{canvas: HTMLCanvasElement, windowId: string} | void> {
     if (windowNameToExclude === '') windowNameToExclude = undefined;
 
     const { stream, screen, windowId } = await CaptureScreen.captureScreen(settings.windowName, windowNameToExclude ? [windowNameToExclude] : undefined) || {};
@@ -38,7 +55,8 @@ export default {
     const ctx = canvas.getContext('2d');
 
     // const availTop = (window.screen as any).availTop - screen.bounds.y;
-    const video = await createVideo(stream);
+    const video = await createVideo(stream, screen);
+
     const loop = () => {
       if (!video || video.paused || video.hidden || video.ended) return false;
 
@@ -46,8 +64,8 @@ export default {
             video,
             x,
             y,
-            screen.workArea.width,
-            screen.workArea.height,
+            screen.size.width,
+            screen.size.height,
             0,
             0,
             canvas.width,

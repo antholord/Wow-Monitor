@@ -1,6 +1,6 @@
 {
   "name": "wow-monitor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -18,6 +18,7 @@
   },
   "main": "background.js",
   "dependencies": {
+    "electron-log": "^4.2.4",
     "electron-store": "^6.0.0",
     "electron-updater": "^4.3.4",
     "vue": "^2.6.11",

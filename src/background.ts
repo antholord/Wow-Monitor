@@ -3,8 +3,11 @@
 import { app, protocol, BrowserWindow, globalShortcut, screen } from 'electron';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
+import { autoUpdater } from 'electron-updater';
+
 import settings from './settings';
 const isDevelopment = process.env.NODE_ENV !== 'production';
+
 app.commandLine.appendSwitch('webrtc-max-cpu-consumption-percentage', '100');
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -19,8 +22,8 @@ protocol.registerSchemesAsPrivileged([
 function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
-    width: screen.getPrimaryDisplay().workAreaSize.width * settings.widthScaleRatio,
-    height: screen.getPrimaryDisplay().workAreaSize.height * settings.heightScaleRatio,
+    width: screen.getPrimaryDisplay().size.width * settings.widthScaleRatio,
+    height: screen.getPrimaryDisplay().size.height * settings.heightScaleRatio,
     frame: false,
     transparent: false,
     webPreferences: {
@@ -67,6 +70,10 @@ app.on('activate', () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', async() => {
+  autoUpdater.checkForUpdatesAndNotify().then((result) => {
+    console.log(result);
+  });
+
   if (isDevelopment && !process.env.IS_TEST) {
     // Install Vue Devtools
     try {

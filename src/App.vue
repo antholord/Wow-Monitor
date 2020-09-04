@@ -18,7 +18,9 @@ export default Vue.extend({
   data() {
     return {
       hideFrame: false,
-      windowId: ''
+      windowId: '',
+      windowWidth: 0,
+      windowHeight: 0
     };
   },
   components: {
@@ -27,25 +29,40 @@ export default Vue.extend({
   async mounted() {
     this.$electron.ipcRenderer.on('swap-game-window', async() => {
       (document.getElementById('canvasParent') as HTMLDivElement).innerHTML = '';
-      console.log(this.windowId);
-      const resp = await GameCapture.start(document.getElementById('canvasParent') as HTMLDivElement, this.windowId);
+      const resp = await GameCapture.startVideo(document.getElementById('canvasParent') as HTMLDivElement, this.windowId);
       if (resp) {
         this.windowId = resp.windowId;
+        this.getWindowSize();
       }
     });
     this.$electron.ipcRenderer.on('toggle-frame', () => {
       this.hideFrame = !this.hideFrame;
     });
 
-    const resp = await GameCapture.start(document.getElementById('canvasParent') as HTMLDivElement);
+    const resp = await GameCapture.startVideo(document.getElementById('canvasParent') as HTMLDivElement);
     if (!resp) return;
-    const canvas = resp.canvas;
     this.windowId = resp.windowId;
+
+    this.$nextTick(function() {
+      window.addEventListener('resize', this.getWindowSize);
+      // Init
+      this.getWindowSize();
+    });
   },
   methods: {
+    getWindowSize() {
+      this.windowHeight = document.documentElement.clientHeight;
+      this.windowWidth = document.documentElement.clientWidth;
+
+      const video = document.getElementById('video') as HTMLVideoElement | null;
+      if (video) {
+        video.width = this.windowWidth;
+        video.height = this.windowHeight;
+      }
+    }
   },
   beforeDestroy() {
-    // this.$electron.ipcRenderer.removeAllListeners('swap-game-window');
+    window.removeEventListener('resize', this.getWindowSize);
   }
 });
 </script>
@@ -64,12 +81,14 @@ body {
   overflow-y: hidden;
 }
 #main {
-  padding-top:32px;
+  /* padding-top:32px; */
   height: calc(100% - 32px);
-  padding: 5px;
   overflow-y: auto;
 }
 h1 {margin: 0 0 10px 0; font-weight: 600; line-height: 1.2;}
 p {margin-top: 10px; color: rgba(255,255,255,0.4);}
 
+video {
+  z-index:1;
+}
 </style>

@@ -94,6 +94,7 @@ header {
   position: fixed;
   height: 32px;
   width: 100%;
+  z-index:1000;
   background: #254053;
 }
 
@@ -114,6 +115,7 @@ header {
   top: 0;
   right: 0;
   height: 100%;
+  z-index: 1000;
 }
 
 #window-controls .button {
