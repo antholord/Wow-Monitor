@@ -1,68 +1,37 @@
 <template>
   <div id="app">
     <electron-header v-show="!hideFrame" />
-
-    <div id="main">
-      <div id="canvasParent">
-      </div>
-    </div>
+    <router-view />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import GameCapture from '@/electron/browser-windows/game-capture';
 import ElectronHeader from '@/components/ElectronHeader.vue';
 
 export default Vue.extend({
   data() {
     return {
-      hideFrame: false,
-      windowId: '',
-      windowWidth: 0,
-      windowHeight: 0
+      hideFrame: false
     };
   },
   components: {
     ElectronHeader
   },
   async mounted() {
-    this.$electron.ipcRenderer.on('swap-game-window', async() => {
-      (document.getElementById('canvasParent') as HTMLDivElement).innerHTML = '';
-      const resp = await GameCapture.startVideo(document.getElementById('canvasParent') as HTMLDivElement, this.windowId);
-      if (resp) {
-        this.windowId = resp.windowId;
-        this.getWindowSize();
+    this.$electron.ipcRenderer.on('toggle-frame', (_, state: boolean) => {
+      if (state) {
+        this.hideFrame = state;
+      } else {
+        this.hideFrame = !this.hideFrame;
       }
-    });
-    this.$electron.ipcRenderer.on('toggle-frame', () => {
-      this.hideFrame = !this.hideFrame;
-    });
-
-    const resp = await GameCapture.startVideo(document.getElementById('canvasParent') as HTMLDivElement);
-    if (!resp) return;
-    this.windowId = resp.windowId;
-
-    this.$nextTick(function() {
-      window.addEventListener('resize', this.getWindowSize);
-      // Init
-      this.getWindowSize();
     });
   },
   methods: {
-    getWindowSize() {
-      this.windowHeight = document.documentElement.clientHeight;
-      this.windowWidth = document.documentElement.clientWidth;
 
-      const video = document.getElementById('video') as HTMLVideoElement | null;
-      if (video) {
-        video.width = this.windowWidth;
-        video.height = this.windowHeight;
-      }
-    }
   },
   beforeDestroy() {
-    window.removeEventListener('resize', this.getWindowSize);
+
   }
 });
 </script>
@@ -79,16 +48,5 @@ body {
   background: #1A2933;
   color: #FFF;
   overflow-y: hidden;
-}
-#main {
-  /* padding-top:32px; */
-  height: calc(100% - 32px);
-  overflow-y: auto;
-}
-h1 {margin: 0 0 10px 0; font-weight: 600; line-height: 1.2;}
-p {margin-top: 10px; color: rgba(255,255,255,0.4);}
-
-video {
-  z-index:1;
 }
 </style>

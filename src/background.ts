@@ -1,18 +1,20 @@
 'use strict';
 
-import { app, protocol, BrowserWindow, globalShortcut, screen } from 'electron';
+import { app, protocol, BrowserWindow, globalShortcut, screen, ipcMain } from 'electron';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 import { autoUpdater } from 'electron-updater';
 
 import settings from './settings';
+import { WindowContainer } from './electron/definitions/definitions';
+import settingsWindow from './electron/browser-windows/settings-window';
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 app.commandLine.appendSwitch('webrtc-max-cpu-consumption-percentage', '100');
 
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
-let win: BrowserWindow | null;
+const windows: WindowContainer = {
+  main: null as BrowserWindow | null
+};
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -21,7 +23,7 @@ protocol.registerSchemesAsPrivileged([
 
 function createWindow() {
   // Create the browser window.
-  win = new BrowserWindow({
+  windows.main = new BrowserWindow({
     width: screen.getPrimaryDisplay().size.width * settings.widthScaleRatio,
     height: screen.getPrimaryDisplay().size.height * settings.heightScaleRatio,
     frame: false,
@@ -36,16 +38,16 @@ function createWindow() {
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
-    win.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string);
-    if (!process.env.IS_TEST) win.webContents.openDevTools();
+    windows.main.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string);
+    if (!process.env.IS_TEST) windows.main.webContents.openDevTools();
   } else {
     createProtocol('app');
     // Load the index.html when not in development
-    win.loadURL('app://./index.html');
+    windows.main.loadURL('app://./index.html');
   }
 
-  win.on('closed', () => {
-    win = null;
+  windows.main.on('closed', () => {
+    windows.main = null;
   });
 }
 
@@ -61,7 +63,7 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (win === null) {
+  if (windows.main === null) {
     createWindow();
   }
 });
@@ -83,7 +85,7 @@ app.on('ready', async() => {
     }
   }
   createWindow();
-  win?.setAlwaysOnTop(true, 'pop-up-menu');
+  windows.main?.setAlwaysOnTop(true, 'pop-up-menu');
 });
 
 // Exit cleanly on request from parent process in development mode.
@@ -103,16 +105,20 @@ if (isDevelopment) {
 
 app.whenReady().then(() => {
   globalShortcut.register(settings.swapGameWindowHotkey, () => {
-    win?.webContents.send('swap-game-window');
+    windows.main?.webContents.send('swap-game-window');
   });
   globalShortcut.register(settings.toggleFrameHotkey, () => {
-    win?.webContents.send('toggle-frame');
+    windows.main?.webContents.send('toggle-frame');
   });
   globalShortcut.register(settings.hideWindowHotkey, () => {
-    if (win?.isMinimized()) {
-      win?.show();
+    if (windows.main?.isMinimized()) {
+      windows.main?.show();
     } else {
-      win?.minimize();
+      windows.main?.minimize();
     }
+  });
+
+  ipcMain.on('toggle-settings', (event, state: boolean) => {
+    settingsWindow.createWindow(windows);
   });
 });
