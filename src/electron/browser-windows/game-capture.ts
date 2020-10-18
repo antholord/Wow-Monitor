@@ -1,6 +1,5 @@
-
 import CaptureScreen from '@/electron/renderer/capture-screen';
-import settings from '../../settings';
+import { settings } from '../../settings';
 
 const x = 0;
 const y = 0;

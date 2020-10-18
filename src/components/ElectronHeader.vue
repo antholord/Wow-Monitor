@@ -6,9 +6,21 @@
       </div>
       <div id="window-controls">
         <div
+          v-show="!isSettingsRoute"
+          class="button"
+          id="settings-button"
+        >
+          <v-icon
+            small
+            @click="openSettings"
+          >
+            settings
+          </v-icon>
+        </div>
+        <div
           class="button"
           id="min-button"
-          @click="win.minimize()"
+          @click="getWindow().minimize()"
         >
           <img
             class="icon"
@@ -21,7 +33,8 @@
           class="button"
           id="max-button"
           v-show="!maximized"
-          @click="win.maximize()"
+          title="Maximize"
+          @click="getWindow().maximize()"
         >
           <img
             class="icon"
@@ -34,7 +47,8 @@
           class="button"
           id="restore-button"
           v-show="maximized"
-          @click="win.unmaximize()"
+          title="Minimize"
+          @click="getWindow().unmaximize()"
         >
           <img
             class="icon"
@@ -46,7 +60,7 @@
         <div
           class="button"
           id="close-button"
-          @click="win.close()"
+          @click="closeWindow"
         >
           <img
             class="icon"
@@ -60,33 +74,65 @@
 </template>
 
 <script lang="ts">
+
 import Vue from 'vue';
 import { BrowserWindow } from 'electron';
+
+let winRef = {} as BrowserWindow | null;
 
 export default Vue.extend({
   data: function() {
     return {
-      maximized: false,
-      win: {} as BrowserWindow
+      maximized: false
     };
   },
   mounted() {
-    this.win = this.$electron.remote.getCurrentWindow();
-
-    const maximizeCallback = () => { this.maximized = true; };
-    const minimizeCallback = () => { this.maximized = false; };
+    winRef = this.$electron.remote.getCurrentWindow() as BrowserWindow;
+    console.log(winRef.title);
+    const maximizeCallback = () => { this.maximized = true; console.log(this.maximized); };
+    const minimizeCallback = () => { this.maximized = false; console.log(this.maximized); };
     window.onbeforeunload = () => {
-      this.win.removeListener('maximize', maximizeCallback);
-      this.win.removeListener('unmaximize', minimizeCallback);
+      console.warn('window closing');
+      if (!winRef) return;
+
+      winRef.removeListener('maximize', maximizeCallback);
+      winRef.removeListener('unmaximize', minimizeCallback);
+      winRef = null;
     };
 
-    this.win.on('maximize', maximizeCallback);
-    this.win.on('unmaximize', minimizeCallback);
+    winRef.on('maximize', maximizeCallback);
+    winRef.on('unmaximize', minimizeCallback);
+  },
+  methods: {
+    getWindow() {
+      return winRef;
+    },
+    openSettings() {
+      this.$electron.ipcRenderer.send('toggle-settings', true);
+    },
+    closeWindow() {
+      if (!winRef) return;
+
+      winRef.close();
+    }
+  },
+  computed: {
+    isSettingsRoute: function() {
+      return this.$route.name === 'Settings';
+    }
+  },
+  beforeDestroy() {
+    winRef = null;
   }
 });
 
 </script>
 <style>
+
+#window-controls > .button > .v-icon {
+  color:#EEEEEE !important;
+  opacity:0.3 !important;
+}
 
 header {
   display: block;
@@ -110,7 +156,7 @@ header {
 
 #window-controls {
   display: grid;
-  grid-template-columns: repeat(3, 46px);
+  grid-template-columns: repeat(4, 46px);
   position: absolute;
   top: 0;
   right: 0;
@@ -126,14 +172,17 @@ header {
   width: 100%;
   height: 100%;
 }
-#min-button {
+#settings-button {
   grid-column: 1;
 }
-#max-button, #restore-button {
+#min-button {
   grid-column: 2;
 }
-#close-button {
+#max-button, #restore-button {
   grid-column: 3;
+}
+#close-button {
+  grid-column: 4;
 }
 
 @media (-webkit-device-pixel-ratio: 1.5), (device-pixel-ratio: 1.5),
@@ -188,7 +237,7 @@ header {
 
 header #drag-region {
   display: grid;
-  grid-template-columns: auto 138px;
+  grid-template-columns: auto 184px;
 }
 
 #window-title {

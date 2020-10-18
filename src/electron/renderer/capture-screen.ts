@@ -1,5 +1,4 @@
 import { desktopCapturer, Display, remote, globalShortcut } from 'electron';
-import settings from '../../settings';
 
 const getSourcesAttempts = 8;
 

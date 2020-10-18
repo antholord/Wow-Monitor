@@ -5,7 +5,8 @@ import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 import { autoUpdater } from 'electron-updater';
 
-import settings from './settings';
+import { settings } from './settings';
+import ElectronStore, { setupConfigEvents } from '@/electron/electron-store';
 import { WindowContainer } from './electron/definitions/definitions';
 import settingsWindow from './electron/browser-windows/settings-window';
 const isDevelopment = process.env.NODE_ENV !== 'production';
@@ -29,6 +30,7 @@ function createWindow() {
     frame: false,
     transparent: false,
     webPreferences: {
+      enableRemoteModule: true,
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
       nodeIntegration: (process.env
@@ -47,6 +49,11 @@ function createWindow() {
   }
 
   windows.main.on('closed', () => {
+    windows.main = null;
+  });
+
+  windows.main.on('close', (e) => {
+    windows.main?.destroy();
     windows.main = null;
   });
 }
@@ -84,6 +91,7 @@ app.on('ready', async() => {
       console.error('Vue Devtools failed to install:', e.toString());
     }
   }
+  setupConfigEvents();
   createWindow();
   windows.main?.setAlwaysOnTop(true, 'pop-up-menu');
 });
@@ -119,6 +127,11 @@ app.whenReady().then(() => {
   });
 
   ipcMain.on('toggle-settings', (event, state: boolean) => {
-    settingsWindow.createWindow(windows);
+    console.log(state);
+    if (state === undefined || state === true) {
+      settingsWindow.createWindow(windows);
+    } else {
+      // hide
+    }
   });
 });

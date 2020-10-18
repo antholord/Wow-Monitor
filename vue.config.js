@@ -3,7 +3,9 @@ module.exports = {
     electronBuilder: {
       nodeIntegration: true,
       builderOptions: {
-        publish: ['github'],
+        publish: [
+          'github'
+        ],
         productName: 'Wow Monitor',
         npmRebuild: false,
         nsis: {
@@ -11,12 +13,20 @@ module.exports = {
           allowToChangeInstallationDirectory: true
         },
         win: {
-          target: ['nsis', 'portable']
+          target: [
+            'nsis',
+            'portable'
+          ]
         },
         linux: {
-          target: ['AppImage']
+          target: [
+            'AppImage'
+          ]
         }
       }
     }
-  }
+  },
+  transpileDependencies: [
+    'vuetify'
+  ]
 };

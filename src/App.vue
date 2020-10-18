@@ -1,7 +1,9 @@
 <template>
   <div id="app">
     <electron-header v-show="!hideFrame" />
-    <router-view />
+    <div id="main">
+      <router-view />
+    </div>
   </div>
 </template>
 
@@ -42,6 +44,15 @@ export default Vue.extend({
 html {box-sizing: border-box;}
 *, *:before, *:after {box-sizing: inherit;}
 html, body {height: 100%; margin: 0;}
+html {
+  overflow-y: hidden !important;
+}
+
+#main {
+  /* padding-top:32px; */
+  height: calc(100% - 32px);
+  overflow-y: auto;
+}
 
 body {
   font-family: "Segoe UI", sans-serif;

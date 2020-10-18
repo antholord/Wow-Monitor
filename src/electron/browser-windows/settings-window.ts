@@ -4,7 +4,6 @@ import { WindowContainer } from '../definitions/definitions';
 import ElectronUtils from '../utils';
 
 const windowName = 'settings';
-// const utils = ElectronUtils;
 
 export default {
   createWindow(winContainer: WindowContainer): BrowserWindow {
@@ -17,10 +16,11 @@ export default {
         width: 800,
         height: 1000,
         frame: false,
-        resizable: false,
+        resizable: true,
         opacity: 1,
         webPreferences: {
           nodeIntegration: true,
+          enableRemoteModule: true,
           webSecurity: false
         }
       });
@@ -35,8 +35,16 @@ export default {
       }
     }
 
+    winContainer.main?.minimize();
+
     winContainer[windowName]!.once('closed', () => {
       winContainer[windowName] = null;
+
+      winContainer.main?.maximize();
+    });
+
+    winContainer[windowName]!.on('hide', () => {
+      winContainer[windowName]?.close();
     });
 
     return winContainer[windowName]!;

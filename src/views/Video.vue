@@ -1,7 +1,5 @@
 <template>
-  <div id="main">
-    <div id="canvasParent">
-    </div>
+  <div id="canvasParent">
   </div>
 </template>
 
