@@ -12,8 +12,8 @@ export const settings: ISettings = {
   widthScaleRatio: 0.5,
   heightScaleRatio: 0.5,
   windowName: 'World of Warcraft',
-  swapGameWindowHotkey: 'CommandOrControl+F2',
-  toggleFrameHotkey: 'CommandOrControl+F3',
-  hideWindowHotkey: 'CommandOrControl+F4',
+  swapGameWindowHotkey: 'CommandOrControl+F5',
+  toggleFrameHotkey: 'CommandOrControl+F2',
+  hideWindowHotkey: 'CommandOrControl+F3',
   altTabHotkey: 'CommandOrControl+F1'
 };

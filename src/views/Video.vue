@@ -36,9 +36,8 @@ export default Vue.extend({
 
         const windowManagerId = lastWindowId.substring(lastWindowId.indexOf(':') + 1, lastWindowId.lastIndexOf(':'));
         const windowManagerWindow = windowManager.getWindows().find(w => w.id.toString() === windowManagerId);
-        console.log(windowManagerWindow);
+
         windowManagerWindow?.bringToTop();
-        windowManagerWindow?.show();
       }
     });
 
