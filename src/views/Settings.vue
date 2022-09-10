@@ -14,7 +14,7 @@ export default Vue.extend({
     };
   },
   created() {
-    this.settings = this.$electron.ipcRenderer.sendSync('get_settings');
+    this.settings = this.$electron.ipcRenderer.sendSync('get-settings');
     console.log(this.settings);
   }
 });

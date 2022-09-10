@@ -1,5 +1,5 @@
 import Store from 'electron-store';
-import { settings, ISettings } from '@/settings.ts';
+import { settings, ISettings } from '@/settings';
 import { ipcMain } from 'electron';
 
 const store = new Store<ISettings>({
@@ -7,7 +7,7 @@ const store = new Store<ISettings>({
 });
 
 export function setupConfigEvents() {
-  ipcMain.on('get_settings', (e) => {
+  ipcMain.on('get-settings', (e) => {
     e.returnValue = store.store;
   });
   // ipcMain.on(PUSH_CONFIG, (e, cfg) => {
@@ -23,5 +23,3 @@ export function setupConfigEvents() {
   //   }
   // });
 }
-
-export default store;

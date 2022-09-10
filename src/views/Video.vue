@@ -6,6 +6,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import GameCapture from '@/electron/browser-windows/game-capture';
+import { windowManager } from 'node-window-manager';
 
 export default Vue.extend({
   data() {
@@ -22,6 +23,22 @@ export default Vue.extend({
       if (resp) {
         this.windowId = resp.windowId;
         this.getWindowSize();
+      }
+    });
+
+    this.$electron.ipcRenderer.on('alt-tab', async() => {
+      const lastWindowId = this.windowId;
+      (document.getElementById('canvasParent') as HTMLDivElement).innerHTML = '';
+      const resp = await GameCapture.startVideo(document.getElementById('canvasParent') as HTMLDivElement, this.windowId);
+      if (resp) {
+        this.windowId = resp.windowId;
+        this.getWindowSize();
+
+        const windowManagerId = lastWindowId.substring(lastWindowId.indexOf(':') + 1, lastWindowId.lastIndexOf(':'));
+        const windowManagerWindow = windowManager.getWindows().find(w => w.id.toString() === windowManagerId);
+        console.log(windowManagerWindow);
+        windowManagerWindow?.bringToTop();
+        windowManagerWindow?.show();
       }
     });
 

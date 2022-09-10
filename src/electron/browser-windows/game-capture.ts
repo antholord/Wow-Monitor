@@ -33,7 +33,7 @@ const createVideo = (stream: MediaStream, screen: Electron.Display | null): Prom
 };
 
 export default {
-  async startVideo(parentDiv: HTMLDivElement, windowNameToExclude?: string) : Promise<{video: HTMLVideoElement, windowId: string} | void> {
+  async startVideo(parentDiv: HTMLDivElement, windowNameToExclude?: string): Promise<{ video: HTMLVideoElement, windowId: string } | void> {
     if (windowNameToExclude === '') windowNameToExclude = undefined;
 
     const { stream, screen, windowId } = await CaptureScreen.captureScreen(settings.windowName, windowNameToExclude ? [windowNameToExclude] : undefined) || {};
@@ -43,51 +43,5 @@ export default {
     parentDiv.appendChild(video);
 
     return { video, windowId: windowId! };
-  },
-  async startCanvas(parentDiv: HTMLDivElement, windowNameToExclude?: string) : Promise<{canvas: HTMLCanvasElement, windowId: string} | void> {
-    if (windowNameToExclude === '') windowNameToExclude = undefined;
-
-    const { stream, screen, windowId } = await CaptureScreen.captureScreen(settings.windowName, windowNameToExclude ? [windowNameToExclude] : undefined) || {};
-    if (stream == null || screen == null) return;
-
-    const canvas = createCanvas(screen);
-    const ctx = canvas.getContext('2d');
-
-    // const availTop = (window.screen as any).availTop - screen.bounds.y;
-    const video = await createVideo(stream, screen);
-
-    const loop = () => {
-      if (!video || video.paused || video.hidden || video.ended) return false;
-
-          ctx!.drawImage(
-            video,
-            x,
-            y,
-            screen.size.width,
-            screen.size.height,
-            0,
-            0,
-            canvas.width,
-            canvas.height
-          );
-          requestAnimationFrame(loop);
-
-      // ctx!.drawImage(
-      //   video,
-      //   x,
-      //   y,
-      //   captureWidth * displayWidthModifier,
-      //   captureHeight * displayHeightModifier,
-      //   0,
-      //   0,
-      //   captureWidth * displayWidthModifier,
-      //   captureHeight * displayHeightModifier
-      // );
-      // requestAnimationFrame(loop);
-    };
-
-    parentDiv.appendChild(canvas);
-    loop();
-    return { canvas, windowId: windowId! };
   }
 };

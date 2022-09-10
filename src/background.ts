@@ -6,7 +6,7 @@ import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
 import { autoUpdater } from 'electron-updater';
 
 import { settings } from './settings';
-import ElectronStore, { setupConfigEvents } from '@/electron/electron-store';
+import { setupConfigEvents } from '@/electron/electron-store';
 import { WindowContainer } from './electron/definitions/definitions';
 import settingsWindow from './electron/browser-windows/settings-window';
 const isDevelopment = process.env.NODE_ENV !== 'production';
@@ -29,6 +29,7 @@ function createWindow() {
     height: screen.getPrimaryDisplay().size.height * settings.heightScaleRatio,
     frame: false,
     transparent: false,
+    focusable: false,
     webPreferences: {
       enableRemoteModule: true,
       // Use pluginOptions.nodeIntegration, leave this alone
@@ -78,7 +79,7 @@ app.on('activate', () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', async() => {
+app.on('ready', async () => {
   autoUpdater.checkForUpdatesAndNotify().then((result) => {
     console.log(result);
   });
@@ -124,6 +125,9 @@ app.whenReady().then(() => {
     } else {
       windows.main?.minimize();
     }
+  });
+  globalShortcut.register(settings.altTabHotkey, () => {
+    windows.main?.webContents.send('alt-tab');
   });
 
   ipcMain.on('toggle-settings', (event, state: boolean) => {
