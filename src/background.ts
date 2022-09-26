@@ -9,13 +9,16 @@ import { settings } from './settings';
 import { setupConfigEvents } from '@/electron/electron-store';
 import { WindowContainer } from './electron/definitions/definitions';
 import settingsWindow from './electron/browser-windows/settings-window';
+import { startAntiAFKScript } from './electron/anti-afk/anti-afk';
 const isDevelopment = process.env.NODE_ENV !== 'production';
-
+console.log(process.version);
 app.commandLine.appendSwitch('webrtc-max-cpu-consumption-percentage', '100');
 
 const windows: WindowContainer = {
   main: null as BrowserWindow | null
 };
+
+let stopAFKScriptCallback: Function | null = null;
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -113,9 +116,6 @@ if (isDevelopment) {
 }
 
 app.whenReady().then(() => {
-  globalShortcut.register(settings.swapGameWindowHotkey, () => {
-    windows.main?.webContents.send('swap-game-window');
-  });
   globalShortcut.register(settings.toggleFrameHotkey, () => {
     windows.main?.webContents.send('toggle-frame');
   });
@@ -128,6 +128,18 @@ app.whenReady().then(() => {
   });
   globalShortcut.register(settings.altTabHotkey, () => {
     windows.main?.webContents.send('alt-tab');
+  });
+
+  globalShortcut.register(settings.antiAFK, () => {
+    if (stopAFKScriptCallback) {
+      stopAFKScriptCallback();
+      stopAFKScriptCallback = null;
+      console.log('script stopped');
+    } else {
+      const resp = startAntiAFKScript();
+      console.log('script started');
+      stopAFKScriptCallback = resp.stop;
+    }
   });
 
   ipcMain.on('toggle-settings', (event, state: boolean) => {
