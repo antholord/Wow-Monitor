@@ -2,7 +2,7 @@ module.exports = {
   pluginOptions: {
     electronBuilder: {
       nodeIntegration: true,
-      externals: ['node-window-manager'],
+      externals: ['node-window-manager', 'robotjs'],
       builderOptions: {
         publish: [
           'github'
