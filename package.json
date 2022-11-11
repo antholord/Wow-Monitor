@@ -48,6 +48,7 @@
     "eslint-plugin-promise": "4.2.1",
     "eslint-plugin-standard": "4.0.1",
     "eslint-plugin-vue": "7.0.1",
+    "node-gyp": "https://github.com/antholord/node-gyp.git",
     "sass": "1.27.0",
     "sass-loader": "10.0.3",
     "typescript": "~4.0.3",
