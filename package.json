@@ -6,7 +6,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "rebuild": "npm rebuild --runtime=electron --target=10.4.7 --disturl=https://atom.io/download/atom-shell --abi=72",
+    "rebuild": "set npm_config_node_gyp=$(npm prefix)/lib/node_modules/node-gyp/bin/node-gyp.js && npm rebuild --runtime=electron --target=10.4.7 --disturl=https://atom.io/download/atom-shell --abi=72",
     "electron:build": "vue-cli-service electron:build",
     "electron:publish": "vue-cli-service electron:build -p always",
     "electron:serve": "vue-cli-service electron:serve",
@@ -15,6 +15,7 @@
   },
   "main": "background.js",
   "dependencies": {
+    "cross-env": "^7.0.3",
     "electron-log": "4.2.4",
     "electron-store": "6.0.1",
     "electron-updater": "4.3.5",
