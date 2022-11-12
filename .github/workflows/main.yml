@@ -23,7 +23,7 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Hash
-      run: type .\dist_electron\latest.yml
+      run: set NODE_OPTIONS=--openssl-legacy-provider && type .\dist_electron\latest.yml
 
   linux:
     runs-on: ubuntu-22.04

@@ -11,7 +11,9 @@
     "electron:publish": "vue-cli-service electron:build -p always",
     "electron:serve": "vue-cli-service electron:serve",
     "postinstall": "electron-builder install-app-deps",
-    "postuninstall": "electron-builder install-app-deps"
+    "postuninstall": "electron-builder install-app-deps",
+    "ci": "cross-env-shell npm_config_node_gyp=../../node_modules/node-gyp/bin/node-gyp.js yarn --lockfile",
+    "ci2": "set NODE_OPTIONS=--openssl-legacy-provider"
   },
   "main": "background.js",
   "dependencies": {
