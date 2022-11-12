@@ -19,7 +19,7 @@ jobs:
       with:
         node-version: 17
     - run: yarn --frozen-lockfile
-    - run: set NODE_OPTIONS=--openssl-legacy-provider && yarn electron:publish
+    - run: yarn electron:publish
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Hash
